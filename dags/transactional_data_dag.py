@@ -2,8 +2,12 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 from airflow import models
 import pandas as pd
+import datetime
 
 bucket_path = models.Variable.get("bucket_path")
+project_id = models.Variable.get("project_id")
+gce_zone = models.Variable.get("gce_zone")
+gce_region = models.Variable.get("gce_region")
 
 credentials = service_account.Credentials.from_service_account_file(bucket_path + 'pkl-playing-fields-7314d23dc2d0.json')
 
@@ -57,25 +61,31 @@ def store_table(result_table, **kwargs):
     credentials = service_account.Credentials.from_service_account_file(bucket_path + 'academi-cloud-etl-792cf79c7663.json')
     project_id = 'academi-cloud-etl'
     client = bigquery.Client(credentials=credentials, project=project_id)
-    job = client.load_table_from_dataframe(result_table, destination='academi-cloud-etl.transactional.transaction_table')
+    client.load_table_from_dataframe(result_table, destination='academi-cloud-etl.transactional.transaction_table')
 
+default_args = {
+    # Tell airflow to start one day ago, so that it runs as soon as you upload it
+    "start_date": datetime.datetime(2021,3,21),
+    'email': ['ekaapramudita7@gmail.com'],
+    'email_on_failure': True,
+    "dataflow_default_options": {
+        "project": project_id,
+        # Set to your region
+        "region": gce_region,
+        # Set to your zone
+        "zone": gce_zone,
+        # This is a subfolder for storing temporary files, like the staged pipeline job.
+        "temp_location": bucket_path + "/tmp/",
+    },
+}
 
-
-
-tables = client.list_tables('pkl-playing-fields:unified_events')
-
-print("Tables contained in '{}':".format('pkl-playing-fields:unified_events'))
-for table in tables:
-    print("{}.{}.{}".format(table.project, table.dataset_id, table.table_id))
-
-# test query to table
-sql = """
-    SELECT * FROM pkl-playing-fields.unified_events.event WHERE event_name = 'purchase_item'
-"""
-
-event_table = gcp2df(sql)
-
-pd = gcp2df(sql)
-
-print(pd.head())
-
+# Define a DAG (directed acyclic graph) of tasks.
+# Any task you create within the context manager is automatically added to the
+# DAG object.
+with models.DAG(
+    # The id you will see in the DAG airflow page
+    "composer_dataflow_dag",
+    default_args=default_args,
+    # The interval with which to schedule the DAG
+    schedule_interval=datetime.timedelta(days=3),  # Override to match your needs
+) as dag:

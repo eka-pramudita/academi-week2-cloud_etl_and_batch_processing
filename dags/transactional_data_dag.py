@@ -63,6 +63,7 @@ def store_table(result_table, **kwargs):
     client = bigquery.Client(credentials=credentials, project=project_id)
     client.load_table_from_dataframe(result_table, destination='academi-cloud-etl.transactional.transaction_table')
 
+
 default_args = {
     # Tell airflow to start one day ago, so that it runs as soon as you upload it
     "start_date": datetime.datetime(2021,3,21),

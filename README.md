@@ -63,7 +63,7 @@ picking data to be processed corresponding to the date.
 <div align="center">
 <img src="https://drive.google.com/uc?export=view&id=1hd_DMJ52Yqiuwyv4xGV30hQvueHugO2m">
 </div><br />
-DAG is scheduled to run every 3 days, processing he table per 
+DAG is scheduled to run every 3 days, processing the table per 
 3 (three) days of events, per DAG run.
 
 ## Implementation

@@ -18,7 +18,8 @@ import datetime
 
 from airflow import models
 from airflow.contrib.operators.dataflow_operator import DataflowTemplateOperator
-from airflow.utils.dates import days_ago
+from airflow.operators.python_operator import PythonOperator
+from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 
 bucket_path = models.Variable.get("bucket_path")
 project_id = models.Variable.get("project_id")
@@ -54,7 +55,19 @@ with models.DAG(
     schedule_interval=datetime.timedelta(days=1),  # Override to match your needs
 ) as dag:
 
-    start_template_job = DataflowTemplateOperator(
+    # store execution date for dataflow to XCom
+    def exec_date_dataflow(**kwargs):
+        return kwargs['ds_nodash']
+
+    # task instance of exec date for dataflow
+    t1 = PythonOperator(
+        task_id='get_date_dataflow',
+        python_callable=exec_date_dataflow,
+        provide_context=True)
+
+    get_date_dataflow = "{{ task_instance.xcom_pull(task_ids='get_date_dataflow') }}"
+
+    dataflow_job = DataflowTemplateOperator(
         # The task id of your job
         task_id="dataflow_operator_transform_csv_to_bq",
         # The name of the template that you're using.
@@ -67,8 +80,38 @@ with models.DAG(
             "javascriptTextTransformFunctionName": "transformCSVtoJSON",
             "JSONPath": bucket_path + "/jsonSchema.json",
             "javascriptTextTransformGcsPath": bucket_path + "/transformCSVtoJSON.js",
-            "inputFilePattern": bucket_path + "/inputFile.txt",
-            "outputTable": project_id + ":average_weather.average_weather",
+            "inputFilePattern": bucket_path + "/keyword_search_search_" + get_date_dataflow,
+            "outputTable": project_id + ":daily_search_history.daily_search_history",
             "bigQueryLoadingTemporaryDirectory": bucket_path + "/tmp/",
         },
     )
+    print("dataflow succeed")
+
+    # store execution date for bigquery to XCom
+    def exec_date_bigquery(**kwargs):
+        return kwargs['ds']
+
+    # task instance of exec date for bigquery
+    t2 = PythonOperator(
+        task_id='get_date_bigquery',
+        python_callable=exec_date_bigquery,
+        provide_context=True)
+
+    get_date_bigquery = "{{ task_instance.xcom_pull(task_ids='get_date_bigquery') }}"
+
+    bigquery_job = BigQueryOperator(
+        task_id = 'bigquery_most_searched_keywords',
+        sql = f'''
+        SELECT  date(created_at) AS `created_date`, search_keyword AS `most_searched_keyword`, search_result_count
+        FROM    `{project_id}.daily_search_history.most_searched_each_day`
+        WHERE   date(created_at) = {get_date_bigquery}
+        ORDER BY    search_result_count
+        LIMIT 1
+        ''',
+        write_disposition = 'WRITE_APPEND',
+        destination_dataset_table = project_id + ":daily_search_history.most_searched_each_day",
+        use_legacy_sql = False,
+    )
+    print("bigquery succeed")
+
+    t1 >> dataflow_job >> t2 >> bigquery_job

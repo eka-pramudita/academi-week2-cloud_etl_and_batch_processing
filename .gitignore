@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Idea
-.idea/
+# credential
+*.json
+
+# testing database
+*.sqlite

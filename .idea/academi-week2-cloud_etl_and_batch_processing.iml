@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.8 (academi-week2-cloud_etl_and_batch_processing)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (academi-week2-cloud_etl_and_batch_processing)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

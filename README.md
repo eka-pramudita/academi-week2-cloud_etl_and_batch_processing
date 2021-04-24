@@ -27,29 +27,56 @@ system, workload automation solutions, and applications native to operating syst
 Batch processing applied on cloud will tackle the resource-intensive
 problem and make it easier to orchestrate jobs. In this project,
 I use one of the most popular cloud service, i.e. 
-[Google Cloud Platform](https://cloud.google.com/).
+[Google Cloud Platform (GCP)](https://cloud.google.com/).
 
-## Google Cloud Platform (GCP) Setup
+## Google Cloud Platform Setup
 There are some setup on tools that needed to be done before using
 GCP for ETL. GCP provides $300 free trial credit for 3 months so
-after applying the free trial, things that we need to set up are:
+after applying the free trial, things that you need to set up are:
 
-1. Service Accounts. Make sure that Service Account used has Owner role
+1. Service Accounts. Make sure that Service Account used has **Owner** role
    to enable all Google Services.
 2. Google Cloud Composer. This is a fully managed workflow orchestration service
    built in popular Apache Airflow open source project and operated using the Python programming language.
    Create an environment here by using the Service Account that has Owner role.
    For complete steps please refer [this page](https://cloud.google.com/composer/docs/how-to/managing/creating).
-3. Create a bucket in Google Cloud Storage to store additional files
-   needed. For complete steps please refer [this page](https://cloud.google.com/composer/docs/how-to/using/using-dataflow-template-operator)
-4. After environment created, go to Environment Configuration then
-   click the Airflow web UI. Set up variables used during ETL process
-   in Admin -> Variables. Set: 
+3. Airflow Web UI. In GCP we use Airflow to schedule workflow. 
+   After environment is created, go to Environment Configuration then click the Airflow web UI. 
+   Set up variables that will be used during ETL process in Admin -> Variables. Set: 
    1. `bucket_path` (path of your created bucket)
    2. `project_id` (your project id)
-   3. `gce_region` (region of you environment e.g us-east4)
-   4. `gce_zone` (region of you environment e.g us-east4-c)
+4. Google Cloud Storage. Create a bucket in Google Cloud Storage to store data sources and additional files
+   needed. For complete steps please refer [this page](https://cloud.google.com/composer/docs/how-to/using/using-dataflow-template-operator)
    
+<div align="center">
+<img src="https://drive.google.com/uc?export=view&id=1eLDSktNDPShVyRoPeQcC2ySiOY-rItc2">
+</div><br />
+
+## Apache Airflow
+Apache Airflow is a platform to programmatically author, schedule, and monitor workflows.
+Workflows are implemented as directed acyclic graphs (DAGs) of tasks. With Airflow, you can
+schedule your tasks and specify dependencies among them. Pipelines also generated to monitor
+tasks status and troubleshoot problem if needed.
+
+<div align="center">
+<img src="https://drive.google.com/uc?export=view&id=1C4eqGhJLqf3-iYfVt0NLz67gOvBluYkd">
+<small> Airflow Web UI </small>
+</div><br />
+
+### Writing DAGs
+There are only 5 steps you need to remember to write an Airflow DAG or workflow:
+
+1. Importing modules
+2. Default Arguments
+3. Instantiate a DAG
+4. Tasks
+5. Setting up Dependencies
+
+For further details please refer to this amazing step-by-step [tutorial](https://www.applydatascience.com/airflow/writing-your-first-pipeline/) 
+by Tuan Vu.
+
+------------------------------------------------------------
+
 ## DAG Scheme on Batch Processing Cases
 
 ### Integrate Daily Search History
@@ -77,14 +104,11 @@ to `/dags` folder. This step will automatically trigger Airflow
 to run the tasks.
    
 3. Go to Airflow Web UI and see your task status there
-<div align="center">
-<img src="https://drive.google.com/uc?export=view&id=1C4eqGhJLqf3-iYfVt0NLz67gOvBluYkd">
-<small> Airflow Web UI </small>
-</div><br />
+
 
 ## Results
-From the Airflow Web UI, we can see whether the task is successfully
-run or not. We also can see the error message when the task failed
+From the Airflow Web UI, you can see whether the task is successfully
+run or not. You also can see the error message when the task failed
 in the log url.
 <div align="center">
 <img src="https://drive.google.com/uc?export=view&id=1On5Ks3teU7zNofwUZvhzI3OthWqqWDXF">

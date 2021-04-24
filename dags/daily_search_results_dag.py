@@ -57,7 +57,7 @@ default_args = {
 # DAG object.
 with models.DAG(
     # The id you will see in the DAG airflow page
-    "composer_dataflow_dag_no_pyhton_ops",
+    "most_searched_keywords_dag",
     default_args=default_args,
     # The interval with which to schedule the DAG
     schedule_interval=timedelta(days=1),  # Override to match your needs
@@ -89,7 +89,7 @@ with models.DAG(
         use_legacy_sql=False,
     )
 
-    bigquery_job = BigQueryOperator(
+    get_most_searched_keyword = BigQueryOperator(
         task_id='bigquery_most_searched_keywords',
         sql=sql_most,
         write_disposition='WRITE_APPEND',
@@ -97,4 +97,4 @@ with models.DAG(
         use_legacy_sql=False,
     )
 
-    store_to_bq >> convert_data_type >> bigquery_job
+    store_to_bq >> convert_data_type >> get_most_searched_keyword

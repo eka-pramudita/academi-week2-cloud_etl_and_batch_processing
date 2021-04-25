@@ -125,24 +125,20 @@ Running Interval: 2021-03-21 until 2021-03-27
 Schedule: Once in 3 days
 
 **Tasks:**
-1. Get events data from external BQ table. Preprocess then store it into own BQ dataset as a raw data. (This task is not included in Airflow)
-2. Query the raw data for 3 days of events to get values needed then store it into the transactions table.
+1. Get events data from external BQ table. Preprocess then store it into own BQ dataset as a raw data.
+2. Query the raw data to get values needed then store it into the transactions table.
 
 **Running steps:**
-1. Keep service account credential of source table and your project 
-   in .json file saved in your project folder to enable data storing.
-   Don't forget to exclude them when doing `git push` since the files have
-   sensitive information. More details on service account credential is on this [page](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
-2. Install requirements needed by running this command in your virtual environment:
-   ```
-   pip install -r requirements.txt
-   ```
-2. Run `store_events_to_bigquery.py` to get, process and put events data to own BQ:
-   ```
-   python store_events_to_bigquery.py
-   ```
-3. Upload daf file `transactions_data_from_events_dag.py` to `dags/` folder of your environment.
-4. Check the task status on Airflow Web UI
+1. Store data source and your project service account credential in folder `data/` of your
+   created environment. More details on service account credential is on this [page](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+2. Set up Airflow connection to GCP to enable Airflow reading credential file stored in `data/`.
+   More details on connection setup is on this [page](https://cloud.google.com/composer/docs/how-to/managing/connections).
+   <div align="center">
+      <img src="https://drive.google.com/uc?export=view&id=1vTdocJm_FRZXGcmu-Py1KJ94MQnpNFIa">
+   </div>
+3. Create dataset named `transactions` in BQ for this task.
+4. Upload dag file `transactions_data_from_events_dag.py` to `dags/` folder of your environment.
+5. Check the task status on Airflow Web UI.
 
 **Results:**
 <div align="center">

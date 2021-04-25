@@ -31,11 +31,12 @@ sql_convert = """
             FROM `academi-cloud-etl.daily_search_history.daily_search_history`
             """
 
-sql_most ="""
-        SELECT  user_id, search_keyword, search_result_count, SAFE_CAST(LEFT(created_at, 10) AS DATE) AS `created_date` 
-        FROM    `academi-cloud-etl.daily_search_history.search_results` 
-        WHERE   SAFE_CAST(LEFT(created_at, 10) AS DATE) = '{{ ds }}'
-        ORDER BY search_result_count DESC
+sql_most = """
+        SELECT search_keyword, sum(search_result_count) `count`, SAFE_CAST(LEFT(created_at, 10) AS DATE) AS `created_date`
+        FROM `academi-cloud-etl.daily_search_history.search_results`
+        WHERE SAFE_CAST(LEFT(created_at, 10) AS DATE) = '{{ ds }}'
+        GROUP BY search_keyword, created_at
+        ORDER BY SUM(search_result_count) DESC 
         LIMIT 1
         """
 

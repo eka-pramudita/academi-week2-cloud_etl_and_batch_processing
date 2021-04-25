@@ -57,7 +57,7 @@ default_args = {
 # DAG object.
 with models.DAG(
     # The id you will see in the DAG airflow page
-    "most_searched_keywords_dag",
+    "composer_dataflow_dag_no_python_ops",
     default_args=default_args,
     # The interval with which to schedule the DAG
     schedule_interval=timedelta(days=1),  # Override to match your needs

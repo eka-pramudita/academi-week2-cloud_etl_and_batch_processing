@@ -26,8 +26,12 @@ Today, batch processing is done by job schedulers, batch processing
 system, workload automation solutions, and applications native to operating systems.
 Batch processing applied on cloud will tackle the resource-intensive
 problem and make it easier to orchestrate jobs. In this project,
-I use one of the most popular cloud service, i.e. 
+I used one of the most popular cloud service, the 
 [Google Cloud Platform (GCP)](https://cloud.google.com/).
+
+<div align="center">
+<img src="https://drive.google.com/uc?export=view&id=1IwiVT8_2bX7v-P-Zk5R6czQyXvKxoRzt">
+</div><br />
 
 ## Google Cloud Platform Setup
 There are some setup on tools that needed to be done before using
@@ -42,18 +46,19 @@ after applying the free trial, things that you need to set up are:
    For complete steps please refer [this page](https://cloud.google.com/composer/docs/how-to/managing/creating).
 3. Airflow Web UI. In GCP we use Airflow to schedule workflow. 
    After environment is created, go to Environment Configuration then click the Airflow web UI. 
-   Set up variables that will be used during ETL process in Admin -> Variables. Set: 
+   Set up variables we will be using in Variables. Set: 
    1. `bucket_path` (path of your created bucket)
    2. `project_id` (your project id)
 4. Google Cloud Storage. Create a bucket in Google Cloud Storage to store data sources and additional files
    needed. For complete steps please refer [this page](https://cloud.google.com/composer/docs/how-to/using/using-dataflow-template-operator)
    
 <div align="center">
-<img src="https://drive.google.com/uc?export=view&id=1eLDSktNDPShVyRoPeQcC2ySiOY-rItc2">
+<img src="https://drive.google.com/uc?export=view&id=1UjoUTatco77GbYR1Jb49g7nuD_lG0dQG">
+<small>Google Cloud Composer Environment Monitoring Tab</small>
 </div><br />
 
 ## Apache Airflow
-Apache Airflow is a platform to programmatically author, schedule, and monitor workflows.
+Apache Airflow is a platform to programmatically (using Python) author, schedule, and monitor workflows.
 Workflows are implemented as directed acyclic graphs (DAGs) of tasks. With Airflow, you can
 schedule your tasks and specify dependencies among them. Pipelines also generated to monitor
 tasks status and troubleshoot problem if needed.
@@ -64,7 +69,7 @@ tasks status and troubleshoot problem if needed.
 </div><br />
 
 ### Writing DAGs
-There are only 5 steps you need to remember to write an Airflow DAG or workflow:
+There are 5 steps you need to remember to write an Airflow DAG or workflow:
 
 1. Importing modules
 2. Default Arguments
@@ -75,42 +80,81 @@ There are only 5 steps you need to remember to write an Airflow DAG or workflow:
 For further details please refer to this amazing step-by-step [tutorial](https://www.applydatascience.com/airflow/writing-your-first-pipeline/) 
 by Tuan Vu.
 
-------------------------------------------------------------
-
-## DAG Scheme on Batch Processing Cases
+## Batch Processing Cases
 
 ### Integrate Daily Search History
+
+Running Interval: 2021-03-10 until 2021-03-15
+
+Schedule: Daily
+
+**Tasks:**
+1. Load .csv files into BigQuery (BQ) table. BQ Schema is same as .csv files.
+2. Convert fields into correct format.
+3. Get the most searched word and store to BQ table.
+
+**Running steps:**
+1. Upload dag file `daily_search_results_dag.py` to `dags/` folder of your environment.
+2. Check the task status on Airflow Web UI
+
+**Result:**
+
 <div align="center">
-<img src="https://drive.google.com/uc?export=view&id=14o54tl6g3HznZ9h9pE_gnGvGTNdH0xr6">
-</div><br />
-DAG is scheduled to run everyday from 2021-03-10 to 2021-03-15,
-picking data to be processed corresponding to the date.
+  <img src="https://drive.google.com/uc?export=view&id=13bnFAqdmZpIuEvju8tl6JPmrMWF4Kac0" width="200" />
+  <img src="https://drive.google.com/uc?export=view&id=17hIhTOkQbg7UQTJttiVIyQ3kHGfc9nam" width="200" /> 
+  <img src="https://drive.google.com/uc?export=view&id=1CnV3AS85ihzwPJrtcbdgTJdPRNsBk2ll" width="200" />
+</div>
+
+**Using Dataflow:**
+
+Before uploading dag file, upload `transformCSVtoJSON.js` and `jsonSchema.json` files to
+your `bucket_path`. However, when I applied the steps, not all dataflow job ran successfully.
+Since it is unstable, then I didn't use dataflow for this task.
+
+<div align="center">
+  <img src="https://drive.google.com/uc?export=view&id=1uUfqALvGZc_SbU-TIwTRBxMA_6RQxCa8" width="200"/> 
+  <img src="https://drive.google.com/uc?export=view&id=1e4t6KZL2N9I6O1A9jAptJeErQCStFcQs" width="200"/> 
+</div>
+
 
 ### Integrate Transactional Data from Unified User Events
+
+Running Interval: 2021-03-21 until 2021-03-27
+
+Schedule: Once in 3 days
+
+**Tasks:**
+1. Get events data from external BQ table. Preprocess then store it into own BQ dataset as a raw data. (This task is not included in Airflow)
+2. Query the raw data for 3 days of events to get values needed then store it into the transactions table.
+
+**Running steps:**
+1. Install requirements needed by running this command in your virtual environment:
+   ```
+   pip install -r requirements.txt
+   ```
+2. Run `store_events_to_bigquery.py` to get, process and put events data to own BQ:
+   ```
+   python store_events_to_bigquery.py
+   ```
+3. Upload daf file `transactions_data_from_events_dag.py` to `dags/` folder of your environment.
+4. Check the task status on Airflow Web UI
+
+**Results:**
 <div align="center">
-<img src="https://drive.google.com/uc?export=view&id=1hd_DMJ52Yqiuwyv4xGV30hQvueHugO2m">
-</div><br />
-DAG is scheduled to run every 3 days, processing the table per 
-3 (three) days of events, per DAG run.
+  <img src="https://drive.google.com/uc?export=view&id=1t_fPtd2Y-FfUCKF9W6urnI6g4jalC0ZX" width="200" />
+  <img src="https://drive.google.com/uc?export=view&id=14NRjSVUzkI5NQ4G92GUUiLppm86VcTL6" width="200" /> 
+</div>
 
-## Implementation
-Follow these steps to run the Batch Processing cases and trigger
-Airflow Web UI to monitor the tasks:
-1. Upload `jsonSchema.json` and `transformCSVtoJSON.js` in the
-`support` folder to your `bucket-path`.
-   
-2. Upload `daily_search_result_dag.py` and `transactional_data_dag.py`
-to `/dags` folder. This step will automatically trigger Airflow 
-to run the tasks.
-   
-3. Go to Airflow Web UI and see your task status there
+**JSON type data handling on BQ:**
 
-
-## Results
-From the Airflow Web UI, you can see whether the task is successfully
-run or not. You also can see the error message when the task failed
-in the log url.
+When you put data in BQ, JSON type data will be automatically parsed so it is much easier
+to get the value of it.
 <div align="center">
-<img src="https://drive.google.com/uc?export=view&id=1On5Ks3teU7zNofwUZvhzI3OthWqqWDXF">
-<small> Failed Task </small>
+<img src="https://drive.google.com/uc?export=view&id=1l5Heitmdl8rD-NQeaK0UPfEeiw2rG9kV">
 </div><br />
+
+## Conclusion
+Cloud technology enables an easier way to do batch processing tasks rather than using on-premise hardware.
+Google Cloud Platform specifically provides a great environment to perform ETL jobs, data pipelining and tasks scheduling
+with all of their services and also supported by Apache Airflow. 
+However, the service stability is somewhat needing attention especially when using Dataflow.

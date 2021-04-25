@@ -104,6 +104,7 @@ Schedule: Daily
   <img src="https://drive.google.com/uc?export=view&id=17hIhTOkQbg7UQTJttiVIyQ3kHGfc9nam" width="200" /> 
   <img src="https://drive.google.com/uc?export=view&id=1CnV3AS85ihzwPJrtcbdgTJdPRNsBk2ll" width="200" />
 </div>
+<br />
 
 **Using Dataflow:**
 
@@ -115,7 +116,7 @@ Since it is unstable, then I didn't use dataflow for this task.
   <img src="https://drive.google.com/uc?export=view&id=1uUfqALvGZc_SbU-TIwTRBxMA_6RQxCa8" width="200"/> 
   <img src="https://drive.google.com/uc?export=view&id=1e4t6KZL2N9I6O1A9jAptJeErQCStFcQs" width="200"/> 
 </div>
-
+<br />
 
 ### Integrate Transactional Data from Unified User Events
 
@@ -148,6 +149,7 @@ Schedule: Once in 3 days
   <img src="https://drive.google.com/uc?export=view&id=1t_fPtd2Y-FfUCKF9W6urnI6g4jalC0ZX" width="200" />
   <img src="https://drive.google.com/uc?export=view&id=14NRjSVUzkI5NQ4G92GUUiLppm86VcTL6" width="200" /> 
 </div>
+<br />
 
 **JSON type data handling on BQ:**
 

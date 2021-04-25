@@ -131,5 +131,3 @@ dmypy.json
 # credential
 *.json
 
-# testing database
-*.sqlite

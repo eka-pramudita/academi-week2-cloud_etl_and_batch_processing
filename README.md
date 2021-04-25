@@ -147,7 +147,7 @@ Schedule: Once in 3 days
 
 **JSON type data handling on BQ:**
 
-When you put data in BQ, JSON type data will be automatically parsed so it is much easier
+When you put data in BQ, JSON type data will be **automatically parsed** so it is much easier
 to get the value of it.
 <div align="center">
 <img src="https://drive.google.com/uc?export=view&id=1l5Heitmdl8rD-NQeaK0UPfEeiw2rG9kV">

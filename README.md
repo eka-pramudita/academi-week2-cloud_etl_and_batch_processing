@@ -128,7 +128,11 @@ Schedule: Once in 3 days
 2. Query the raw data for 3 days of events to get values needed then store it into the transactions table.
 
 **Running steps:**
-1. Install requirements needed by running this command in your virtual environment:
+1. Keep service account credential of source table and your project 
+   in .json file saved in your project folder to enable data storing.
+   Don't forget to exclude them when doing `git push` since the files have
+   sensitive information. More details on service account credential is on this [page](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+2. Install requirements needed by running this command in your virtual environment:
    ```
    pip install -r requirements.txt
    ```
